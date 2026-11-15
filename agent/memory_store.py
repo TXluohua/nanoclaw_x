@@ -38,7 +38,7 @@ import re
 import threading
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from typing import Protocol
 
 # BM25 参数（经验值，一般不用调）
 BM25_K1 = 1.5
@@ -65,9 +65,6 @@ class MemoryEntry:
     index: int
     text: str
     tokens: list[str] = field(default_factory=list)
-
-    def as_dict(self) -> dict[str, Any]:
-        return {"index": self.index, "text": self.text}
 
 
 def tokenize(text: str) -> list[str]:
@@ -287,10 +284,6 @@ class MemoryRetriever:
         """强制重建索引（新增记忆后想立刻生效时用）。"""
         with self._lock:
             self._rebuild_locked(self._file_mtime())
-
-    def all_entries(self) -> list[str]:
-        self._ensure_loaded()
-        return [e.text for e in self._entries]
 
     # ---- 检索 ----
     def recall_sync(self, query: str, top_k: int | None = None) -> list[str]:

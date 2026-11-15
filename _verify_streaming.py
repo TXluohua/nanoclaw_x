@@ -9,7 +9,7 @@ import os
 import sys
 import tempfile
 
-from providers.base import LLMResponse, ToolCallRequest
+from providers.base import LLMResponse
 
 PASS, FAIL = [], []
 

@@ -104,12 +104,38 @@ Windows GBK 编码不支持 emoji，使用 `[MCP]`、`[!]` 等文本标记代替
 
 ## 支持的传输协议
 
-当前仅支持 `stdio` 传输（通过 StdioServerParameters 启动子进程）。
+支持三种，配置里不写 `type` 也能按配置形状自动推断：
 
-未来可扩展支持：
-- HTTP SSE
-- WebSocket
-- 自定义传输
+| 传输 | 配置形状 | 说明 |
+|---|---|---|
+| `stdio` | `command` + `args` | 本地子进程，最常见 |
+| `http` | `url`（+ `headers` / `bearer_token`） | Streamable HTTP，远程服务 |
+| `sse` | `url`（+ `headers` / `bearer_token`） | 老一代远程传输，仍有 Server 在用 |
+
+推断规则：有 `url` 按 `http` 处理，有 `command` 按 `stdio` 处理；显式写 `"type"` 优先。
+
+```jsonc
+// 本地子进程
+"poetry": { "command": "python", "args": ["mcp_servers/poetry_server.py"], "risk_level": "auto" }
+
+// 远程服务（带鉴权）
+"remote_kb": {
+  "type": "http",
+  "url": "https://example.com/mcp",
+  "bearer_token": "${KB_TOKEN}",
+  "risk_level": "confirm"
+}
+```
+
+## 自愈能力
+
+| 能力 | 行为 |
+|---|---|
+| 调用超时 | 单次 `call_tool` 有超时（默认 60s），不会把会话挂死 |
+| 断线重连 | 调用失败时自动重建连接并重试一次（配置从 `mcp_config` 取，不从已清空的状态取） |
+| 周期探活 | 启动后台健康检查（默认 60s），发现 down 自动重连 |
+| 幂等关闭 | `shutdown()` 可重复调用，不会二次 `__aexit__` 报错 |
+| 启动降级 | 单个 Server 连不上只跳过并打警告，不阻塞主链路 |
 
 ## 调试 MCP Server
 
@@ -121,9 +147,10 @@ npx @modelcontextprotocol/inspector python mcp_servers/poetry_server.py
 ## 注意事项
 
 1. **超时处理**: 单个 server 连接超时 30s，失败会跳过并打印警告
-2. **清理顺序**: 退出时先关闭 ClientSession，再关闭 stdio_client
+2. **清理顺序**: 退出时必须**逆序**——先关 ClientSession，再关 transport 上下文；顺序反了会让 session 的消息循环对着已关闭的流报错
 3. **工具去重**: 如果多个 server 提供同名工具，会以不同前缀注册
 4. **错误处理**: 工具调用失败返回错误字符串，不会中断对话
+5. **相对路径**: stdio 的 `args` 是相对路径时，必须给子进程指定 `cwd`（本项目用 config.json 所在目录），否则会按"启动时的当前目录"解析
 
 ## 参考文档
 

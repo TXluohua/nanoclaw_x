@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # NanoClaw .gitignore
 # 目标：凭据与运行产物绝不进版本库
 # ============================================================
@@ -38,12 +38,6 @@ botpy.log.*
 data/
 *.db
 *.sqlite3
-features_zh.md
-features_en.md
-todo.txt
-workflow_graph.png
-workflow_mermaid.md
-graph.png
 
 # ---- Python ----
 __pycache__/

@@ -283,59 +283,6 @@ def render_trace_timeline(agent: AgentLoop) -> str:
     return header + "\n" + Tracer.format_timeline(events)
 
 
-async def interactive_loop(agent: AgentLoop) -> None:
-    """
-    交互式对话循环
-
-    读取用户输入，调用 Agent 处理并打印响应。
-    支持命令：/exit、/clear、/tools
-
-    Args:
-        agent: AgentLoop 实例
-    """
-    print("\n开始对话（输入 /exit 退出）")
-
-    while True:
-        try:
-            # 读取用户输入
-            user_input = input("\n你: ").strip()
-
-            # 空输入跳过
-            if not user_input:
-                continue
-
-            # 处理命令
-            if user_input == "/exit":
-                print("再见！")
-                break
-
-            if user_input == "/clear":
-                agent.clear_history()
-                print("对话历史已清空")
-                continue
-
-            if user_input == "/tools":
-                tools = agent.tools.list_tools()
-                print(f"可用工具: {', '.join(tools)}")
-                continue
-
-            # 调用 Agent 处理
-            print("\nNanoClaw: ", end="", flush=True)
-            response = await agent.run(user_input)
-            print(response)
-
-        except KeyboardInterrupt:
-            # Ctrl+C 优雅退出
-            print("\n\n再见！")
-            break
-
-        except EOFError:
-            # 输入结束（如管道输入完毕）
-            print("\n再见！")
-            break
-
-
-# 新版：通过 Gateway 启动
 async def async_main() -> None:
     """
     异步主入口

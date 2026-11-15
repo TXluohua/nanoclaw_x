@@ -1,11 +1,8 @@
 """Web 渠道实现模块，提供 WebSocket 接口。"""
 
-import asyncio
 import json
 import uuid
 from pathlib import Path
-from typing import Any
-
 import uvicorn
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse

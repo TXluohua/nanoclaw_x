@@ -1,9 +1,6 @@
 """QQ 渠道实现模块。"""
 
-import asyncio
 import re
-from typing import Any
-
 import botpy
 from botpy.message import GroupMessage, C2CMessage
 

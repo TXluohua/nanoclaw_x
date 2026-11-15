@@ -5,7 +5,6 @@
 支持 HTTP/HTTPS 协议，自动处理重定向和超时。
 """
 
-import asyncio
 import re
 from typing import Any
 from urllib.parse import urlparse

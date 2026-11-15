@@ -30,7 +30,7 @@ MessageBus 提供异步消息队列，支持多渠道接入：
 """
 
 import asyncio
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 
