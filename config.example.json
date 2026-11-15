@@ -1,0 +1,51 @@
+{
+    "base_url": "https://api.deepseek.com",
+    "models": {
+        "main": "deepseek-v4-pro",
+        "subagent": "deepseek-flash",
+        "cheap": "deepseek-flash"
+    },
+    "workspace": ".",
+    "max_iterations": 32,
+    "identity_file": "identity.md",
+    "feishu": {
+        "app_id": "",
+        "app_secret": ""
+    },
+    "qq": {
+        "app_id": "",
+        "app_secret": ""
+    },
+    "web": {
+        "enabled": true,
+        "host": "127.0.0.1",
+        "port": 8080
+    },
+    "permissions": {
+        "enabled": true,
+        "pending_ttl_seconds": 1800
+    },
+    "tracing": {
+        "enabled": true
+    },
+    "pricing": {
+        "_说明": "USD / 每百万 token。按官方价目表填写；留空则只统计 token、不算钱",
+        "deepseek-chat": {
+            "input": 0.0,
+            "output": 0.0
+        }
+    },
+    "budget": {
+        "_说明": "0 表示不限制",
+        "session_tokens": 0,
+        "session_cost_usd": 0.0
+    },
+    "mcp_servers": {
+        "poetry": {
+            "command": "python",
+            "args": ["mcp_servers/poetry_server.py"],
+            "description": "古诗词查询服务",
+            "risk_level": "auto"
+        }
+    }
+}

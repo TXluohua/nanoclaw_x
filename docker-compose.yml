@@ -1,0 +1,69 @@
+services:
+  # ---- 主服务：NanoClaw 引擎（含 Web 渠道 + MCP 子进程）----
+  nanoclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nanoclaw:0.2.0
+    container_name: nanoclaw
+    restart: unless-stopped
+
+    # ★ 密钥只在运行时注入，不进镜像
+    env_file:
+      - .env
+
+    environment:
+      # 容器内必须监听 0.0.0.0，否则宿主机访问不到
+      NANOCLAW_WEB_HOST: 0.0.0.0
+      NANOCLAW_WEB_PORT: "8080"
+      # 容器里没有交互式终端，CLI 渠道的 input() 会立刻 EOF，
+      # 这是正常的；需要对话请走 Web 界面。
+      PYTHONUNBUFFERED: "1"
+
+    ports:
+      - "127.0.0.1:8080:8080"   # 只绑本机，避免直接暴露到局域网
+
+    volumes:
+      # 运行期数据持久化：会话、记忆、待确认动作、trace、任务清单
+      - ./workspace:/app/workspace
+      # 配置文件与密钥分开挂载，方便改了重启生效而不用重建镜像
+      - ./config.json:/app/config.json:ro
+      - ./.env:/app/.env:ro
+      # 自定义人设与技能（可选）
+      - ./identity.md:/app/identity.md:ro
+      - ./skills:/app/skills:ro
+
+    # 让容器向宿主机转发信号，Ctrl+C / docker stop 能优雅退出
+    stop_grace_period: 20s
+    init: true
+
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+    # 资源上限：Agent 跑 Shell 命令时容易失控，给个天花板
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+# 关于把 MCP Server 拆成独立容器
+# --------------------------------
+# 现在 poetry MCP 是 stdio 子进程，跟着主容器一起跑，最简单也最稳。
+# 如果要拆成独立服务（跨主机共享、独立扩缩容），把传输换成 http 即可，
+# 代码已经支持（见 agent/tools/mcp.py 的 TRANSPORT_HTTP）：
+#
+#   "mcp_servers": {
+#     "poetry": {
+#       "type": "http",
+#       "url": "http://poetry-mcp:8000/mcp",
+#       "bearer_token": "${POETRY_MCP_TOKEN}",
+#       "risk_level": "auto"
+#     }
+#   }
+#
+# 有独立容器后，client 端会自动做：断线重连、健康探活、调用超时。

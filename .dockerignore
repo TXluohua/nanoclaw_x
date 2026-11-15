@@ -1,0 +1,48 @@
+# 构建上下文排除清单
+#
+# 目标：镜像里不出现密钥、用户数据、运行产物。
+# 每条都对应一个真实风险，不是为了整洁。
+
+# ---- 密钥（★ 最重要）----
+.env
+.env.*
+!.env.example
+config.json
+*.key
+*.pem
+
+# ---- 用户数据与运行产物 ----
+workspace/
+data/
+*.log
+*.db
+*.sqlite3
+.nanoclaw.pid
+
+# ---- 版本控制与 IDE ----
+.git/
+.gitignore
+.vscode/
+.idea/
+.claude/
+
+# ---- Python 缓存 ----
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# ---- 测试与脚本（镜像里不需要）----
+tests/
+_verify_*.py
+_修复记录_*.md
+_功能说明_*.md
+
+# ---- 文档与大文件 ----
+*.md
+!requirements.txt
+ffmpeg*/
+datasets/

@@ -1,0 +1,68 @@
+﻿# ============================================================
+# NanoClaw .gitignore
+# 目标：凭据与运行产物绝不进版本库
+# ============================================================
+
+# ---- 凭据与本地配置（★ 最重要：绝对不能提交）----
+.env
+.env.*
+!.env.example
+config.json
+*.key
+*.pem
+
+# ---- 会话 / 记忆 / 审批 / trace / 任务清单（★ 全部属于运行期数据）----
+#
+# 这里用"整目录忽略 + 白名单"而不是逐个列子目录。
+# 原因：这些子目录是功能迭代中陆续加的（sessions → memory → approvals
+# → traces → todos → sessions_smoke），逐条列必然漏。今天就已经漏了
+# todos/ 和 sessions_smoke/ —— 而 todos 里存的是用户的待办内容，
+# 属于隐私数据，漏出去比代码泄漏更难解释。
+workspace/*
+!workspace/.gitkeep
+
+# 显式再列一遍（部分是历史遗留路径，保留以防有人改上面的通配）
+workspace/sessions/
+workspace/memory/
+workspace/approvals/
+workspace/traces/
+workspace/todos/
+workspace/_archive/
+
+# ---- 运行产物 ----
+.nanoclaw.pid
+botpy.log
+botpy.log.*
+*.log
+*.log.*
+data/
+*.db
+*.sqlite3
+features_zh.md
+features_en.md
+todo.txt
+workflow_graph.png
+workflow_mermaid.md
+graph.png
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- 编辑器 / 工具 ----
+.claude/settings.local.json
+.vscode/
+.idea/
+*.swp
+
+# ---- 系统 ----
+.DS_Store
+Thumbs.db
+desktop.ini
