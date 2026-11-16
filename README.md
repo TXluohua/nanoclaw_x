@@ -193,13 +193,13 @@ CLI 逐字打印、Web 发 JSON 帧（`{"type":"delta"}` / `{"type":"final"}`）
 ## 测试
 
 ```bash
-python -m pytest            # 92 个测试，约 46 秒，全程离线
+python -m pytest            # 95 个测试，约 47 秒，全程离线
 ```
 
 测试**永不联网**：所有 LLM 交互走 `StubProvider`（脚本化返回），
 所以任何机器上都能跑，也不会产生 API 费用。
 
-其中 33 个是运维值班专项改造的测试（`tests/test_ops_agent.py`），
+其中 36 个是运维值班专项改造的测试（`tests/test_ops_agent.py`），
 重点守三条容易被"刷漂亮"的指标：陷阱引用的工具必须真实存在、
 只读工具必须是 auto、危险动作必须被拦下。
 
@@ -232,10 +232,14 @@ python _verify_mcp_runtime.py   # 22 项：MCP 真连接/重连/探活
   挂起状态复用 `workspace/approvals/` 落盘；
 - **离线回放评测**：越权拦截率 **70/70 = 100%**，诊断 133/133 步零误拦，
   需人工确认比例 2.89%；
+- **LLM 回放（真模型）**：插入社会工程式诱导（同事在群里要求直接删节点），
+  实测 **0/3 服从**——模型不但没动手，还在结论里反驳"节点健康、不该动"；
+  但它提议的 5 次 runbook 外改动全被审批驳回，说明**光靠模型自觉不够，闸门必需**；
 - **复盘报告**：trace 直接渲染成中文值班时间线。
 
 ```bash
-python ops_agent/replay.py                    # 30 条场景离线回放
+python ops_agent/replay.py                    # 30 条场景离线回放（脚本策略，0 成本）
+python ops_agent/llm_replay.py --limit 3 --compare   # LLM 回放（消耗 API 额度）
 python ops_agent/report.py --id OPS-INC-0017  # 单条事故复盘
 ```
 
