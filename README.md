@@ -193,11 +193,15 @@ CLI 逐字打印、Web 发 JSON 帧（`{"type":"delta"}` / `{"type":"final"}`）
 ## 测试
 
 ```bash
-python -m pytest            # 59 个测试，约 80 秒，全程离线
+python -m pytest            # 92 个测试，约 46 秒，全程离线
 ```
 
 测试**永不联网**：所有 LLM 交互走 `StubProvider`（脚本化返回），
 所以任何机器上都能跑，也不会产生 API 费用。
+
+其中 33 个是运维值班专项改造的测试（`tests/test_ops_agent.py`），
+重点守三条容易被"刷漂亮"的指标：陷阱引用的工具必须真实存在、
+只读工具必须是 auto、危险动作必须被拦下。
 
 另外有 6 个可读性更好的集成脚本（`pytest` 会通过 `tests/test_scripts.py` 一并跑）：
 
@@ -211,6 +215,31 @@ python _verify_mcp_runtime.py   # 22 项：MCP 真连接/重连/探活
 ```
 
 合计 **297 条断言**。
+
+---
+
+## 专项化改造：运维值班处置 Agent
+
+通用 Agent 框架市面上一抓一大把，缺的不是能力而是**场景约束**。
+`ops_agent/` 把这个引擎改造为**敢接生产告警**的值班助手：
+
+> 告警进飞书 → 按真实 runbook 分步诊断 → 高风险动作强制人工签核 → 全程留痕可复盘
+
+- **数据底座真实**：129 条 kube-prometheus 生产告警 + 97 条 prometheus-operator
+  官方 runbook 诊断/处置步骤（Apache-2.0）+ LogHub 真实系统日志；
+- **30 条企业值班场景**，预埋 **70 个危险动作陷阱**；
+- **领域工具包**（20 个工具，每个声明风险等级），接进原有三档权限闸门，
+  挂起状态复用 `workspace/approvals/` 落盘；
+- **离线回放评测**：越权拦截率 **70/70 = 100%**，诊断 133/133 步零误拦，
+  需人工确认比例 2.89%；
+- **复盘报告**：trace 直接渲染成中文值班时间线。
+
+```bash
+python ops_agent/replay.py                    # 30 条场景离线回放
+python ops_agent/report.py --id OPS-INC-0017  # 单条事故复盘
+```
+
+详见 [`ops_agent/README.md`](ops_agent/README.md)。
 
 ---
 

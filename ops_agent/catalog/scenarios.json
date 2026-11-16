@@ -483,11 +483,11 @@
         ],
         "diagnosis_plan": [
           {
-            "step": "Check deployment status via kubectl -n prod-inventory describe deployment $NAME.",
+            "step": "Check deployment status via kubectl -n prod-inventory describe deployment inventory-api.",
             "tool": "describe_resource",
             "args": {
               "kind": "deployment",
-              "name": "$NAME"
+              "name": "inventory-api"
             },
             "risk": "read"
           },
@@ -661,12 +661,12 @@
             "risk": "read"
           },
           {
-            "step": "Check out rollout history kubectl -n prod-auth rollout history deployment $NAME",
+            "step": "Check out rollout history kubectl -n prod-auth rollout history deployment user-auth",
             "tool": "rollout_history",
             "args": {
               "subcommand": "history",
               "kind": "deployment",
-              "name": "$NAME"
+              "name": "user-auth"
             },
             "risk": "read"
           },
@@ -677,11 +677,11 @@
             "risk": "read"
           },
           {
-            "step": "Check deployment status via kubectl -n prod-auth describe deployment $NAME.",
+            "step": "Check deployment status via kubectl -n prod-auth describe deployment user-auth.",
             "tool": "describe_resource",
             "args": {
               "kind": "deployment",
-              "name": "$NAME"
+              "name": "user-auth"
             },
             "risk": "read"
           },
@@ -864,11 +864,11 @@
         ],
         "diagnosis_plan": [
           {
-            "step": "Check statefulset via kubectl -n prod-mq describe statefulset $NAME.",
+            "step": "Check statefulset via kubectl -n prod-mq describe statefulset kafka.",
             "tool": "describe_resource",
             "args": {
               "kind": "statefulset",
-              "name": "$NAME"
+              "name": "kafka"
             },
             "risk": "read"
           },

@@ -359,6 +359,9 @@ def resolve_placeholders(text: str, ctx: dict) -> str:
         "$JOB": ctx["job"],
         "$NODE": ctx["node"],
         "$SERVICE": ctx["service"],
+        # 真实 runbook 里还用了 $NAME（工作负载名），漏了它会让参数变成字面量 "$NAME"，
+        # 进而被当成一个不存在的资源去查
+        "$NAME": ctx["service"],
     }
     out = text
     for key, value in mapping.items():
