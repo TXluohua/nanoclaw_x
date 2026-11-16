@@ -1,10 +1,12 @@
 """下载运维知识底座的原始数据（可复现，全部为公开数据）。
 
-下载内容与用途：
-  kube-prometheus PrometheusRule  → 真实告警定义（129 条）
-  kubernetes-mixin runbook.md     → 告警 Message / Severity 权威描述
-  LogHub HDFS_2k.log              → 真实系统日志样本（供「查日志」工具使用）
-  danluu/post-mortems README      → 真实事故复盘索引（校准场景合理性）
+下载内容与用途（每一份都被下游用到，不留无用数据）：
+  kube-prometheus PrometheusRule  → build_catalog.py 的输入：真实告警定义（129 条）
+  kubernetes-mixin runbook.md     → build_catalog.py 的输入：告警 Message / Severity
+  LogHub HDFS_2k.log              → search_log 工具的日志语料（真实系统日志）
+
+runbook 页面 HTML 不在此脚本里下载：它由 build_catalog.py 按需抓取并缓存，
+缓存用完即弃（当前不保留），需要时 `--refresh` 重新抓。
 
 数据落到 ops_agent/data/raw/（已在 .gitignore 内，不入版本库）。
 
@@ -50,8 +52,6 @@ SOURCES: list[tuple[str, str, str]] = [
     (f"{BASE_MIXIN}runbook.md", "kubernetes_mixin_runbook.md", "告警 Message/Severity 索引"),
     ("https://raw.githubusercontent.com/logpai/loghub/master/HDFS/HDFS_2k.log",
      "HDFS_2k.log", "真实 HDFS 系统日志样本"),
-    ("https://raw.githubusercontent.com/danluu/post-mortems/master/README.md",
-     "danluu_postmortems_README.md", "真实事故复盘索引"),
 ]
 
 UA = {"User-Agent": "nanoclaw-ops-agent/1.0"}
